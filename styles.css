@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+
+
+form, .button-container {
+    margin-bottom: 20px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.highlight {
+    background-color: #ffff99;
+    font-weight: bold;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+/* 新添加的样式 */
+.multiplication-table {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.cell {
+    padding: 5px;
+    text-align: center;
+}
+
+.spacer {
+    height: 20px;
+}
+
+/* 在文件末尾添加以下样式 */
+.multiplication-table.vertical {
+    flex-direction: column;
+}
+
+.multiplication-table.vertical .group {
+    flex-direction: row;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
