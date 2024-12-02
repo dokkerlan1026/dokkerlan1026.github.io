@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 對話助手</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI 對話助手</h1>
+            <div class="controls">
+                <button id="testConnectionBtn">測試連線</button>
+                <button id="toggleSpeechBtn" title="開關AI語音回應">🔊</button>
+            </div>
+        </div>
+        <div class="chat-container" id="chatContainer">
+            <!-- 對話內容會在這裡動態添加 -->
+        </div>
+        
+        <div class="input-container">
+            <textarea id="userInput" placeholder="輸入訊息..."></textarea>
+            <button id="sendBtn">發送</button>
+            <button id="voiceBtn">
+                <span class="mic-icon">🎤</span>
+            </button>
+        </div>
+        <template id="loadingTemplate">
+            <div class="message ai-message loading">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </template>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 

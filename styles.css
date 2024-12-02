@@ -1,78 +1,183 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
 
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+}
 
-form, .button-container {
+.chat-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    height: 500px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    margin-left: 20%;
+}
+
+.ai-message {
+    background-color: #e9ecef;
+    color: black;
+    margin-right: 20%;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+textarea {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    height: 50px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#voiceBtn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listening {
+    background-color: #dc3545 !important;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-table {
-    border-collapse: collapse;
+.header h1 {
+    margin: 0;
+    font-size: 24px;
 }
 
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
+#testConnectionBtn {
+    background-color: #28a745;
+}
+
+#testConnectionBtn:hover {
+    background-color: #218838;
+}
+
+#testConnectionBtn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.system-message {
+    background-color: #ffc107;
+    color: #000;
+    margin: 10px auto;
+    max-width: 80%;
     text-align: center;
 }
 
-.highlight {
-    background-color: #ffff99;
-    font-weight: bold;
-}
-
-.button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-/* 新添加的样式 */
-.multiplication-table {
+.controls {
     display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#toggleSpeechBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 20px;
 }
 
-.group {
+/* 添加載入動畫相關樣式 */
+.typing-indicator {
     display: flex;
-    flex-direction: column;
+    gap: 4px;
+    padding: 4px 8px;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: #666;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
 }
 
-.cell {
-    padding: 5px;
-    text-align: center;
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
 }
 
-.spacer {
-    height: 20px;
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
 }
 
-/* 在文件末尾添加以下样式 */
-.multiplication-table.vertical {
-    flex-direction: column;
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
 }
 
-.multiplication-table.vertical .group {
-    flex-direction: row;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
+@keyframes typing {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
+
+.loading {
+    background-color: #f8f9fa !important;
+    max-width: 100px;
+} 
