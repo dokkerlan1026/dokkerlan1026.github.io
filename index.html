@@ -3,39 +3,849 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 對話助手</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>九重閣翻譯工具</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Serif TC", serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a1a0a 100%);
+            color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ffd700;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #ff6b35, #ff4500);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 40px;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            letter-spacing: 0.2em;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+            animation: fadeInUp 1s ease-out 0.2s both;
+            position: relative;
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            position: relative;
+        }
+
+        .left-panel::before, .right-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, #ff6b35);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .panel-title {
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .language-select {
+            width: 100%;
+            max-width: 250px;
+            padding: 12px;
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #f5f5f5;
+            transition: all 0.3s ease;
+            font-family: "Noto Serif TC", serif;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .language-select:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .language-select option {
+            background: #1a1a1a;
+            color: #f5f5f5;
+        }
+
+        .voice-btn {
+            background: linear-gradient(90deg, #ffb347 0%, #ff6b35 50%, #ff4500 100%);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .voice-btn:hover {
+            background: linear-gradient(135deg, #ff4500, #ff6b35);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .voice-btn.recording {
+            background: linear-gradient(135deg, #dc3545, #ff4500);
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-btn.recording:hover {
+            background: linear-gradient(135deg, #c82333, #dc3545);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .text-area {
+            width: 100%;
+            height: 250px;
+            padding: 20px;
+            border: 2px solid #ff6b35;
+            border-radius: 15px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: "Noto Serif TC", serif;
+            background: rgba(255, 255, 255, 0.08);
+            color: #f5f5f5;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .text-area::placeholder {
+            color: #aaa;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .voice-status {
+            font-size: 13px;
+            color: #ffd700;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 0 0 3px rgba(255, 215, 0, 0.3);
+            min-height: 20px;
+        }
+
+        .center-controls {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        .swap-btn {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .swap-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .action-buttons {
+           
+            padding: 20px 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            font-family: "Noto Serif TC", serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f5f5f5;
+            border: 2px solid #ff6b35;
+            font-weight: 700;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #ffd700;
+            margin-top: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 215, 0, 0.2);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error {
+            color: #ff6b35;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(255, 107, 53, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .success {
+            color: #ffd700;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .main-layout {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 20px;
+            }
+            
+            .center-controls {
+                flex-direction: row;
+                height: auto;
+                min-width: 0;
+                margin: 20px 0;
+                justify-content: center;
+            }
+            .swap-btn {
+                margin: 0 0 0 0;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>AI 對話助手</h1>
-            <div class="controls">
-                <button id="testConnectionBtn">測試連線</button>
-                <button id="toggleSpeechBtn" title="開關AI語音回應">🔊</button>
+        <h1>九重閣翻譯工具</h1>
+        
+        <div class="main-layout">
+            <!-- 左側面板 -->
+            <div class="left-panel">
+                <div class="panel-title">左側語言</div>
+                <select id="sourceLanguage" class="language-select">
+                    <option value="auto">自動偵測</option>
+                    <option value="zh-TW" selected>繁體中文</option>
+                    <option value="zh-CN">簡體中文</option>
+                    <option value="en">英文</option>
+                    <option value="ja">日文</option>
+                    <option value="ko">韓文</option>
+                    <option value="fr">法文</option>
+                    <option value="de">德文</option>
+                    <option value="es">西班牙文</option>
+                    <option value="pt">葡萄牙文</option>
+                    <option value="it">義大利文</option>
+                    <option value="ru">俄文</option>
+                </select>
+                
+                <button class="voice-btn" id="sourceVoiceBtn" onclick="toggleVoiceInput('source')">
+                    🎤 語音輸入
+                </button>
+                
+                <textarea id="sourceText" class="text-area" placeholder="請輸入要翻譯的文字..."></textarea>
+                <div class="voice-status" id="sourceVoiceStatus"></div>
+                <button class="btn btn-primary" id="leftToRightBtn" style="margin-top:20px;width:100%;max-width:220px;">
+                    ➡️ 翻譯到右側
+                </button>
+            </div>
+            
+            <!-- 中央控制區 -->
+            <div class="center-controls">
+                <button class="swap-btn" onclick="swapLanguages()">
+                    ⇄
+                </button>
+            </div>
+            
+            <!-- 右側面板 -->
+            <div class="right-panel">
+                <div class="panel-title">右側語言</div>
+                <select id="targetLanguage" class="language-select">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="zh-CN">簡體中文</option>
+                    <option value="en" selected>英文</option>
+                    <option value="ja">日文</option>
+                    <option value="ko">韓文</option>
+                    <option value="fr">法文</option>
+                    <option value="de">德文</option>
+                    <option value="es">西班牙文</option>
+                    <option value="pt">葡萄牙文</option>
+                    <option value="it">義大利文</option>
+                    <option value="ru">俄文</option>
+                </select>
+                
+                <button class="voice-btn" id="targetVoiceBtn" onclick="toggleVoiceInput('target')">
+                    🎤 語音輸入
+                </button>
+                
+                <textarea id="targetText" class="text-area" placeholder="請輸入要翻譯的文字..."></textarea>
+                <div class="voice-status" id="targetVoiceStatus"></div>
+                <button class="btn btn-primary" id="rightToLeftBtn" style="margin-top:20px;width:100%;max-width:220px;">
+                    ⬅️ 翻譯到左側
+                </button>
             </div>
         </div>
-        <div class="chat-container" id="chatContainer">
-            <!-- 對話內容會在這裡動態添加 -->
+                        <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearText()">
+                        🗑️ 清除全部
+                    </button>
+                </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>AI 正在翻譯中...</p>
         </div>
         
-        <div class="input-container">
-            <textarea id="userInput" placeholder="輸入訊息..."></textarea>
-            <button id="sendBtn">發送</button>
-            <button id="voiceBtn">
-                <span class="mic-icon">🎤</span>
-            </button>
-        </div>
-        <template id="loadingTemplate">
-            <div class="message ai-message loading">
-                <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </template>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        // 語言代碼對應
+        const languageCodes = {
+            'zh-TW': '繁體中文',
+            'zh-CN': '簡體中文',
+            'en': '英文',
+            'ja': '日文',
+            'ko': '韓文',
+            'fr': '法文',
+            'de': '德文',
+            'es': '西班牙文',
+            'pt': '葡萄牙文',
+            'it': '義大利文',
+            'ru': '俄文'
+        };
+
+        // 交換語言
+        function swapLanguages() {
+            const sourceSelect = document.getElementById('sourceLanguage');
+            const targetSelect = document.getElementById('targetLanguage');
+            const sourceText = document.getElementById('sourceText');
+            const targetText = document.getElementById('targetText');
+            
+            // 交換選擇的語言
+            const tempValue = sourceSelect.value;
+            sourceSelect.value = targetSelect.value;
+            targetSelect.value = tempValue;
+            
+            // 交換文字內容
+            const tempText = sourceText.value;
+            sourceText.value = targetText.value;
+            targetText.value = tempText;
+        }
+
+        // 翻譯功能
+        async function translate(direction = 'left-to-right') {
+            let sourceText, sourceLanguage, targetLanguage, targetElement;
+            
+            if (direction === 'left-to-right') {
+                sourceText = document.getElementById('sourceText').value.trim();
+                sourceLanguage = document.getElementById('sourceLanguage').value;
+                targetLanguage = document.getElementById('targetLanguage').value;
+                targetElement = 'targetText';
+            } else {
+                sourceText = document.getElementById('targetText').value.trim();
+                sourceLanguage = document.getElementById('targetLanguage').value;
+                targetLanguage = document.getElementById('sourceLanguage').value;
+                targetElement = 'sourceText';
+            }
+            
+            if (!sourceText) {
+                showError('請輸入要翻譯的文字');
+                return;
+            }
+            
+            if (sourceLanguage === targetLanguage && sourceLanguage !== 'auto') {
+                showError('來源語言和目標語言不能相同');
+                return;
+            }
+            
+            showLoading(true);
+            hideMessages();
+            
+            try {
+                // 使用 AI API 進行翻譯
+                const response = await fetch('https://free.v36.cm/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer sk-ckV04NFuTJHAD4nO40637dD493C842DbA462F9D04790Ad67'
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `你是一個專業的翻譯專家。請將以下文字翻譯成目標語言，要求：
+1. 使用當地人的自然語氣和表達方式
+2. 保持原文的意思和語調
+3. 只返回翻譯後的內容，不要添加任何解釋或額外文字
+4. 確保翻譯準確且符合目標語言的語言習慣`
+                            },
+                            {
+                                role: 'user',
+                                content: `請將以下文字從 ${getLanguageName(sourceLanguage)} 翻譯成 ${getLanguageName(targetLanguage)}：
+                                
+${sourceText}`
+                            }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.3
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    const translatedText = data.choices[0].message.content.trim();
+                    document.getElementById(targetElement).value = translatedText;
+                    showSuccess('AI 翻譯完成！');
+                } else {
+                    throw new Error('翻譯失敗');
+                }
+            } catch (error) {
+                console.error('翻譯錯誤:', error);
+                showError('翻譯失敗，請稍後再試');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 獲取語言名稱
+        function getLanguageName(languageCode) {
+            const languageNames = {
+                'auto': '自動偵測',
+                'zh-TW': '繁體中文',
+                'zh-CN': '簡體中文',
+                'en': '英文',
+                'ja': '日文',
+                'ko': '韓文',
+                'fr': '法文',
+                'de': '德文',
+                'es': '西班牙文',
+                'pt': '葡萄牙文',
+                'it': '義大利文',
+                'ru': '俄文'
+            };
+            return languageNames[languageCode] || languageCode;
+        }
+
+        // 清除文字
+        function clearText() {
+            document.getElementById('sourceText').value = '';
+            document.getElementById('targetText').value = '';
+            hideMessages();
+        }
+
+
+
+        // 顯示載入中
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 顯示成功訊息
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 隱藏所有訊息
+        function hideMessages() {
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+        }
+
+        // 自動翻譯功能（當輸入文字時）
+        let translateTimeout;
+        let translateTimeoutRight;
+        
+        // 左側輸入監聽
+        document.getElementById('sourceText').addEventListener('input', function() {
+            clearTimeout(translateTimeout);
+            translateTimeout = setTimeout(() => {
+                if (this.value.trim()) {
+                    translate('left-to-right');
+                }
+            }, 1000); // 1秒延遲
+        });
+        
+        // 右側輸入監聽
+        document.getElementById('targetText').addEventListener('input', function() {
+            clearTimeout(translateTimeoutRight);
+            translateTimeoutRight = setTimeout(() => {
+                if (this.value.trim()) {
+                    translate('right-to-left');
+                }
+            }, 1000); // 1秒延遲
+        });
+
+        // 語音識別相關變數
+        let recognition = null;
+        let isRecording = false;
+        let currentVoiceTarget = null;
+
+        // 初始化語音識別
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                
+                recognition.onstart = function() {
+                    isRecording = true;
+                    updateVoiceButton(currentVoiceTarget, true);
+                    updateVoiceStatus(currentVoiceTarget, '正在聆聽...');
+                };
+                
+                recognition.onresult = function(event) {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    if (finalTranscript) {
+                        const textArea = document.getElementById(currentVoiceTarget === 'source' ? 'sourceText' : 'targetText');
+                        textArea.value += finalTranscript;
+                        
+                        // 自動觸發翻譯
+                        if (currentVoiceTarget === 'source') {
+                            setTimeout(() => {
+                                translate('left-to-right');
+                            }, 500);
+                        } else if (currentVoiceTarget === 'target') {
+                            setTimeout(() => {
+                                translate('right-to-left');
+                            }, 500);
+                        }
+                    }
+                    
+                    updateVoiceStatus(currentVoiceTarget, interimTranscript ? `識別中: ${interimTranscript}` : '正在聆聽...');
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('語音識別錯誤:', event.error);
+                    updateVoiceStatus(currentVoiceTarget, `錯誤: ${event.error}`);
+                    stopVoiceRecording();
+                };
+                
+                recognition.onend = function() {
+                    isRecording = false;
+                    updateVoiceButton(currentVoiceTarget, false);
+                    updateVoiceStatus(currentVoiceTarget, '語音輸入已停止');
+                };
+            } else {
+                showError('您的瀏覽器不支援語音識別功能');
+            }
+        }
+
+        // 切換語音輸入
+        function toggleVoiceInput(target) {
+            if (!recognition) {
+                initSpeechRecognition();
+            }
+            
+            if (isRecording) {
+                stopVoiceRecording();
+            } else {
+                startVoiceRecording(target);
+            }
+        }
+
+        // 開始語音錄製
+        function startVoiceRecording(target) {
+            if (!recognition) {
+                showError('語音識別功能初始化失敗');
+                return;
+            }
+            
+            // 設定目標語言
+            if (target === 'source') {
+                const sourceLanguage = document.getElementById('sourceLanguage').value;
+                recognition.lang = getSpeechRecognitionLang(sourceLanguage);
+            } else {
+                const targetLanguage = document.getElementById('targetLanguage').value;
+                recognition.lang = getSpeechRecognitionLang(targetLanguage);
+            }
+            
+            currentVoiceTarget = target;
+            
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('啟動語音識別失敗:', error);
+                showError('啟動語音識別失敗');
+            }
+        }
+
+        // 停止語音錄製
+        function stopVoiceRecording() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+        }
+
+        // 更新語音按鈕狀態
+        function updateVoiceButton(target, recording) {
+            const btn = document.getElementById(target === 'source' ? 'sourceVoiceBtn' : 'targetVoiceBtn');
+            if (recording) {
+                btn.classList.add('recording');
+                btn.innerHTML = '🔴 停止錄音';
+            } else {
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 語音輸入';
+            }
+        }
+
+        // 更新語音狀態
+        function updateVoiceStatus(target, message) {
+            const status = document.getElementById(target === 'source' ? 'sourceVoiceStatus' : 'targetVoiceStatus');
+            status.textContent = message;
+        }
+
+        // 獲取語音識別語言代碼
+        function getSpeechRecognitionLang(languageCode) {
+            const langMap = {
+                'zh-TW': 'zh-TW',
+                'zh-CN': 'zh-CN',
+                'en': 'en-US',
+                'ja': 'ja-JP',
+                'ko': 'ko-KR',
+                'fr': 'fr-FR',
+                'de': 'de-DE',
+                'es': 'es-ES',
+                'pt': 'pt-BR',
+                'it': 'it-IT',
+                'ru': 'ru-RU',
+                'auto': 'zh-TW' // 預設使用繁體中文
+            };
+            return langMap[languageCode] || 'zh-TW';
+        }
+
+        // 鍵盤快捷鍵
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Enter 翻譯（左到右）
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                translate('left-to-right');
+            }
+
+            // Ctrl+Shift+V 開始語音輸入（來源）
+            if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+                e.preventDefault();
+                toggleVoiceInput('source');
+            }
+            // Ctrl+Shift+T 開始語音輸入（目標）
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                toggleVoiceInput('target');
+            }
+            // Ctrl+Shift+R 翻譯（右到左）
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                translate('right-to-left');
+            }
+        });
+
+        // 添加按鈕事件監聽器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 左到右翻譯按鈕
+            document.getElementById('leftToRightBtn').addEventListener('click', function() {
+                translate('left-to-right');
+            });
+            
+            // 右到左翻譯按鈕
+            document.getElementById('rightToLeftBtn').addEventListener('click', function() {
+                translate('right-to-left');
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>
